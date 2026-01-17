@@ -286,7 +286,7 @@ def run_analysis_for_dataset(dataset_name, base_path):
         ax2.set_ylim(-0.2, 1.0)
         
         plt.tight_layout()
-        plt.savefig(os.path.join(os.getcwd(), 'src', 'visualisations', 'Figure6.pdf'), dpi=600, bbox_inches="tight")
+        plt.savefig(os.path.join(os.getcwd(), 'src', 'visualisations', 'Figure5.pdf'), dpi=600, bbox_inches="tight")
         plt.close()
         
     
@@ -301,7 +301,7 @@ def main():
     """
     # Set base paths
     project_base = os.getcwd()
-    data_base = os.path.join(project_base, 'application_pre_processing_Figure5')
+    data_base = os.path.join(project_base, 'application_pre_processing_Figure4')
     
     # Change to project directory to ensure imports work
     os.chdir(project_base)
