@@ -26,6 +26,9 @@ import pandas as pd
 import tensorflow_probability.substrates.jax as tfp
 tfp_dist = tfp.distributions
 
+P = 1
+K = 2
+
 @jax.jit
 def corr_sup_ig_envelope(h, params):
     gamma, eta = params
@@ -43,10 +46,12 @@ def run_analysis_for_dataset(dataset_name, base_path):
     vec_key = jax.random.PRNGKey(999)
     vec_key = jax.random.split(vec_key, num_samples)
     calibration_type = 'beta'
-    nlags = 40  # Number of lags for ACF
+    nlags = 30  # Number of lags for ACF
+
+
     
     # Load data set
-    data_path = os.path.join(base_path, 'MSTL_results_14', dataset_name, f'{dataset_name}_MSTL.csv')
+    data_path = os.path.join(base_path, f'OLS_results_p{P}_k{K}', dataset_name, f'{dataset_name}_OLS.csv')
     data_df = pd.read_csv(data_path)
     data_column = data_df['resid']
 
@@ -154,7 +159,7 @@ def run_analysis_for_dataset(dataset_name, base_path):
     results_MAP = result_samples[argmax]
     
     # Save results
-    save_path = os.path.join(base_path, 'MSTL_results_14', dataset_name)
+    save_path = os.path.join(base_path, f'OLS_results_p{P}_k{K}', dataset_name)
     np.save(os.path.join(save_path, 'posterior_samples.npy'), result_samples)
     np.save(os.path.join(save_path, 'MAP_results.npy'), results_MAP)
     np.save(os.path.join(save_path, 'sample_densities.npy'), sample_densities)
@@ -207,8 +212,8 @@ def run_analysis_for_dataset(dataset_name, base_path):
     }
     np.save(os.path.join(save_path, 'parameter_statistics.npy'), param_stats)
     
-    if dataset_name == 'AZPS':
-        # for AZPS we display a further plot, which requires debiasing the empiricla ACF
+    if dataset_name == 'BPAT':
+        # for BPAT we display a further plot, which requires debiasing the empiricla ACF
         # Estimate bias using MAP parameters
         print(f"Estimating CI for {dataset_name}...")
         key, bias_key = jax.random.split(key)
@@ -243,6 +248,7 @@ def run_analysis_for_dataset(dataset_name, base_path):
         data_array = np.array(x).squeeze()
         map_marginal_params_nig = convert_3_to_4_param_nig(map_marginal_params_standardized)
         x_min, x_max = data_array.min(), data_array.max()
+        x_max = 50 # adjust for BPAT plotting for the figure, there are barely any samples above 50
         x_range = np.linspace(x_min, x_max, 10000)
         x_range_standardized = (x_range - mean_x) / std_x
         
@@ -319,13 +325,13 @@ def main():
         
         all_results[dataset_name] = {}
         
-        # Process MSTL results
+        # Process OSL results
         try:
-            print(f"\nProcessing MSTL data for {dataset_name}...")
-            samples_mstl, map_mstl = run_analysis_for_dataset(dataset_name, data_base)
-            all_results[dataset_name] = {'samples': samples_mstl, 'MAP': map_mstl}
+            print(f"\nProcessing OLS data for {dataset_name}...")
+            samples_ols, map_ols = run_analysis_for_dataset(dataset_name, data_base)
+            all_results[dataset_name] = {'samples': samples_ols, 'MAP': map_ols}
         except Exception as e:
-            print(f"Error processing MSTL data for {dataset_name}: {e}")
+            print(f"Error processing OLS data for {dataset_name}: {e}")
 
     
     # Create summary plots comparing all datasets
@@ -341,7 +347,7 @@ def main():
             map_result = all_results[dataset_name]['MAP']
                 
             #Load parameter statistics
-            save_path = os.path.join(data_base, 'MSTL_results_14', dataset_name)
+            save_path = os.path.join(data_base, f'OLS_results_p{P}_k{K}', dataset_name)
             param_stats = np.load(os.path.join(save_path, 'parameter_statistics.npy'), allow_pickle=True).item()
                 
             summary_data.append({
