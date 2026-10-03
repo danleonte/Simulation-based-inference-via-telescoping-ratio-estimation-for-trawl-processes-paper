@@ -84,7 +84,7 @@ for respondent in df['respondent'].unique():
     
     # Left plot: Original series and trend+seasonality
     ax1.plot(original_series.index, original_series.values, 'b-', alpha=0.7, label='Original', linewidth=0.8)
-    ax1.plot(trend_seasonality.index, trend_seasonality.values, 'r-', alpha=0.65, label='Trend+Seasonality', linewidth=0.75)
+    ax1.plot(trend_seasonality.index, trend_seasonality.values, 'r-', alpha=0.75, label='Trend+Seasonality', linewidth=0.4)
     ax1.set_title("Original vs Trend+Seasonality Time Series",fontsize=16)
     ax1.set_xlabel("Date",fontsize=14)
     ax1.set_ylabel("Value",fontsize=14)
@@ -103,9 +103,9 @@ for respondent in df['respondent'].unique():
     
     plt.tight_layout()
     plt.savefig(os.path.join(respondent_dir, f"{respondent}_comparison.pdf"), dpi=150, bbox_inches="tight")
-    if respondent == 'AZPS':
-        save_path = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'src','visualisations', "Figure5.pdf")
-        plt.savefig(save_path, dpi=150, bbox_inches="tight")
+    if respondent == 'BPAT':
+        save_path = os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)),'src','visualisations', "Figure4.pdf")
+        plt.savefig(save_path, dpi=450, bbox_inches="tight")
     plt.close()
     
 
